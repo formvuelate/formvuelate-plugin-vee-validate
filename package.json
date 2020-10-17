@@ -12,7 +12,8 @@
     "url": "git+ssh://git@github.com/formvuelate/formvuelate-plugin-vee-validate.git"
   },
   "author": {
-    "name": "Abdelrahman Awad"
+    "name": "Abdelrahman Awad",
+    "email": "logaretm1@gmail.com"
   },
   "license": "MIT",
   "scripts": {

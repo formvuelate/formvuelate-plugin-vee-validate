@@ -1,6 +1,6 @@
-# @formvuelate/plugin-lookup
+# @formvuelate/plugin-vee-validate
 
-## WIP. Do not use
+# WIP. Do not use!
 
 Vee-validate plugin for FormVueLate
 

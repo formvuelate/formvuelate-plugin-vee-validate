@@ -43,7 +43,7 @@ export default function VeeValidatePlugin (baseReturns) {
     }),
     parsedSchema: computed(() => formSchema)
   }
-} 
+}
 
 export function withField (Comp) {
   return {

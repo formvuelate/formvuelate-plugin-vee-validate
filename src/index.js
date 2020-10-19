@@ -10,41 +10,38 @@ import { useForm, useField } from 'vee-validate';
  */
 export const mapElementsInSchema = (schema, fn) => schema.map(row => row.map(el => fn(el)))
 
-export default function VeeValidatePluginFactory () {
-  return function VeeValidatePlugin(baseReturns) {
-    // Take the parsed schema from SchemaForm setup returns
-    const { parsedSchema, formBinds } = baseReturns
-  
-  
-    // Get additional properties not defined on the `SchemaForm` derivatives
-    const { attrs: formAttrs } = getCurrentInstance();
-    // Create a form context and inject the validation schema if needed
-    const { handleSubmit } = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
-    });
-    // Map components in schema to enhanced versions with `useField`
-    const formSchema = mapElementsInSchema(parsedSchema.value, el => {
-      return {
-        ...el,
-        component: markRaw(withField(el.component))
-      }
-    })
+export default function VeeValidatePlugin (baseReturns) {
+  // Take the parsed schema from SchemaForm setup returns
+  const { parsedSchema, formBinds } = baseReturns
 
-    const boundSubmit = formBinds.value.onSubmit;  
-    const onSubmit = handleSubmit((_, { evt }) => {
-      boundSubmit(evt);
-    });
-  
+  // Get additional properties not defined on the `SchemaForm` derivatives
+  const { attrs: formAttrs } = getCurrentInstance();
+  // Create a form context and inject the validation schema if needed
+  const { handleSubmit } = useForm({
+    validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
+  });
+  // Map components in schema to enhanced versions with `useField`
+  const formSchema = mapElementsInSchema(parsedSchema.value, el => {
     return {
-      ...baseReturns,
-      formBinds: computed(() => {
-        return {
-          ...baseReturns.formBinds.value,
-          onSubmit,
-        }
-      }),
-      parsedSchema: computed(() => formSchema)
+      ...el,
+      component: markRaw(withField(el.component))
     }
+  })
+
+  const boundSubmit = formBinds.value.onSubmit;  
+  const onSubmit = handleSubmit((_, { evt }) => {
+    boundSubmit(evt);
+  });
+
+  return {
+    ...baseReturns,
+    formBinds: computed(() => {
+      return {
+        ...baseReturns.formBinds.value,
+        onSubmit,
+      }
+    }),
+    parsedSchema: computed(() => formSchema)
   }
 } 
 

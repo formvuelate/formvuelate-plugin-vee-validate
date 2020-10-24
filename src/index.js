@@ -1,4 +1,4 @@
-import { toRefs, h, computed, markRaw, watch, getCurrentInstance } from 'vue'
+import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref } from 'vue'
 import { useForm, useField } from 'vee-validate';
 
 /**
@@ -10,44 +10,60 @@ import { useForm, useField } from 'vee-validate';
  */
 export const mapElementsInSchema = (schema, fn) => schema.map(row => row.map(el => fn(el)))
 
-export default function VeeValidatePlugin (baseReturns) {
-  // Take the parsed schema from SchemaForm setup returns
-  const { parsedSchema, formBinds } = baseReturns
-
-  // Get additional properties not defined on the `SchemaForm` derivatives
-  const { attrs: formAttrs } = getCurrentInstance();
-  // Create a form context and inject the validation schema if provided
-  const { handleSubmit } = useForm({
-    validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
-  });
-
-  // Map components in schema to enhanced versions with `useField`
-  const formSchema = mapElementsInSchema(parsedSchema.value, el => {
-    return {
-      ...el,
-      component: markRaw(withField(el.component))
-    }
-  })
-
-  // override the submit function with one that triggers validation
-  const formSubmit = formBinds.value.onSubmit;  
-  const onSubmit = handleSubmit((_, { evt }) => {
-    formSubmit(evt);
-  });
-
+/**
+ * Maps the validation state to props
+ */
+function defaultMapProps(validation, el) {
   return {
-    ...baseReturns,
-    formBinds: computed(() => {
+    validation,
+  };
+}
+
+export default function VeeValidatePlugin(opts) {
+  // Maps the validation state exposed by vee-validate to components
+  const mapProps = (opts && opts.mapProps) || defaultMapProps
+
+  return function veeValidatePlugin(baseReturns) {
+  // Take the parsed schema from SchemaForm setup returns
+    const { parsedSchema, formBinds } = baseReturns
+
+    // Get additional properties not defined on the `SchemaForm` derivatives
+    const { attrs: formAttrs } = getCurrentInstance();
+    // Create a form context and inject the validation schema if provided
+    const { handleSubmit } = useForm({
+      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
+    });
+
+    // Map components in schema to enhanced versions with `useField`
+    const formSchema = mapElementsInSchema(parsedSchema.value, el => {
       return {
-        ...baseReturns.formBinds.value,
-        onSubmit,
+        ...el,
+        component: markRaw(withField(el, mapProps))
       }
-    }),
-    parsedSchema: computed(() => formSchema)
+    })
+
+    // override the submit function with one that triggers validation
+    const formSubmit = formBinds.value.onSubmit;  
+    const onSubmit = handleSubmit((_, { evt }) => {
+      formSubmit(evt);
+    });
+
+    return {
+      ...baseReturns,
+      formBinds: computed(() => {
+        return {
+          ...baseReturns.formBinds.value,
+          onSubmit,
+        }
+      }),
+      parsedSchema: computed(() => formSchema)
+    }
   }
 }
 
-export function withField (Comp) {
+export function withField(el, mapProps) {
+  const Comp = el.component;
+
   return {
     name: 'withFieldWrapper',
     props: {
@@ -61,10 +77,9 @@ export function withField (Comp) {
       }
     },
     setup (props, { attrs }) {
-      const { validations, modelValue, model } = toRefs(props)
-      const fieldName = model ? model.value : attrs.model
+      const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
-      const { value, errorMessage } = useField(fieldName, validations || attrs.rules, {
+      const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(attrs.model, validations, {
         initialValue
       })
       
@@ -79,7 +94,13 @@ export function withField (Comp) {
         return h(Comp, {
           ...props,
           ...attrs,
-          errorMessage: errorMessage.value
+          ...mapProps({
+            errorMessage: unref(errorMessage),
+            errors: unref(errors),
+            meta,
+            setDirty,
+            setTouched,
+          }, el)
         })
       }
     },

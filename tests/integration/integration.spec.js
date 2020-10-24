@@ -9,6 +9,17 @@ const FormText = {
   template: `
     <div>
       <input @input="$emit('update:modelValue', $event.target.value)" />
+      <span>{{ validation.errorMessage }}</span>
+    </div>
+  `,
+  emits: ['update:modelValue'],
+  props: ['label', 'modelValue', 'validation']
+}
+
+const FormTextWithProps = {
+  template: `
+    <div>
+      <input @input="$emit('update:modelValue', $event.target.value)" />
       <span>{{ errorMessage }}</span>
     </div>
   `,
@@ -23,19 +34,17 @@ const MIN_MESSAGE = 'Too short'
 const EMAIL_MESSAGE = 'Invalid Email'
 
 describe('FVL integration', () => {
-  it('renders error messages using errorMessage prop', async () => {
-    const schema = [
-      {
-        type: 'BaseInput',
+  it('renders error messages using validation prop', async () => {
+    const schema = {
+      firstName: {
         label: 'First Name',
-        model: 'firstName',
         component: FormText,
         validations: yup.string().required(REQUIRED_MESSAGE),
       },
-    ]
+    }
 
     const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin
+      veeValidatePlugin()
     ])
 
     const wrapper = mount({
@@ -63,16 +72,59 @@ describe('FVL integration', () => {
     expect(wrapper.find('span').text()).toBe('')
   })
 
+  it('maps validation state to props', async () => {
+    const schema = [
+      {
+        label: 'First Name',
+        model: 'firstName',
+        component: FormTextWithProps,
+        validations: yup.string().required(REQUIRED_MESSAGE),
+      },
+    ]
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin({
+        mapProps: (state) => {
+          return {
+            errorMessage: state.errorMessage,
+          }
+        }
+      })
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup() {
+        const formData = ref({});
+        return {
+          schema,
+          formData
+        }
+      }
+    });
+
+    const input = wrapper.findComponent(FormTextWithProps)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe(REQUIRED_MESSAGE)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
+
   it('does form-level validation with validation-schema attr', async () => {
     const schema = [
       {
-        type: 'BaseInput',
         label: 'Email',
         model: 'email',
         component: FormText,
       },
       {
-        type: 'BaseInput',
         label: 'Password',
         model: 'password',
         component: FormText,
@@ -80,7 +132,7 @@ describe('FVL integration', () => {
     ]
 
     const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin
+      veeValidatePlugin()
     ])
 
     const wrapper = mount({
@@ -127,13 +179,11 @@ describe('FVL integration', () => {
   it('validates before submission', async () => {
     const schema = [
       {
-        type: 'BaseInput',
         label: 'Email',
         model: 'email',
         component: FormText,
       },
       {
-        type: 'BaseInput',
         label: 'Password',
         model: 'password',
         component: FormText,
@@ -141,7 +191,7 @@ describe('FVL integration', () => {
     ]
 
     const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin
+      veeValidatePlugin()
     ])
 
     const onSubmit = jest.fn();

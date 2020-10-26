@@ -12,11 +12,12 @@
     "url": "git+ssh://git@github.com/formvuelate/formvuelate-plugin-vee-validate.git"
   },
   "author": {
-    "name": "Abdelrahman Awad"
+    "name": "Abdelrahman Awad",
+    "email": "logaretm1@gmail.com"
   },
   "license": "MIT",
   "scripts": {
-    "build": "rollit",
+    "build": "rollit --global vee-validate:VeeValidate vue:Vue --externals vee-validate vue",
     "test": "yarn test:unit",
     "test:unit": "jest --coverage",
     "test:unit:watch": "yarn test:unit --watch",
@@ -33,14 +34,18 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "flush-promises": "^1.0.2",
     "formvuelate": "^2.0.0-beta.3",
     "jest": "^26.0.1",
     "rollit": "^0.0.9",
+    "vee-validate": "^4.0.0-beta.10",
     "vue": "^3.0.0-beta.12",
-    "vue-jest": "^5.0.0-alpha.0"
+    "vue-jest": "^5.0.0-alpha.0",
+    "yup": "^0.29.3"
   },
   "peerDependencies": {
     "formvuelate": "^2.0.0-beta.3",
+    "vee-validate": "^4.0.0-beta.10",
     "vue": "^3.0.0-beta.12"
   },
   "files": [

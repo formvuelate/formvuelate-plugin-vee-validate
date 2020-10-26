@@ -13,7 +13,7 @@ export const mapElementsInSchema = (schema, fn) => schema.map(row => row.map(el 
 /**
  * Maps the validation state to props
  */
-function defaultMapProps(validation, el) {
+function defaultMapProps(validation) {
   return {
     validation,
   };

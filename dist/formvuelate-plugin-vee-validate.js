@@ -22,7 +22,7 @@ var mapElementsInSchema = function (schema, fn) { return schema.map(function (ro
 /**
  * Maps the validation state to props
  */
-function defaultMapProps(validation, el) {
+function defaultMapProps(validation) {
   return {
     validation: validation,
   };

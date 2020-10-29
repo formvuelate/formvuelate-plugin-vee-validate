@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v1.0.1
+ * @formvuelate/plugin-vee-validate v1.0.2
  * (c) 2020 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -39,7 +39,10 @@ function VeeValidatePlugin(opts) {
     var formAttrs = ref.attrs;
     // Create a form context and inject the validation schema if provided
     var ref$1 = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
+      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema'],
+      initialErrors: formAttrs['initial-errors'] || formAttrs['initialErrors'],
+      initialDirty: formAttrs['initial-dirty'] || formAttrs['initialDirty'],
+      initialTouched: formAttrs['initial-touched'] || formAttrs['initialTouched'],
     });
     var handleSubmit = ref$1.handleSubmit;
 

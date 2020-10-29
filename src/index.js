@@ -31,7 +31,10 @@ export default function VeeValidatePlugin(opts) {
     const { attrs: formAttrs } = getCurrentInstance();
     // Create a form context and inject the validation schema if provided
     const { handleSubmit } = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema']
+      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema'],
+      initialErrors: formAttrs['initial-errors'] || formAttrs['initialErrors'],
+      initialDirty: formAttrs['initial-dirty'] || formAttrs['initialDirty'],
+      initialTouched: formAttrs['initial-touched'] || formAttrs['initialTouched'],
     });
 
     // Map components in schema to enhanced versions with `useField`

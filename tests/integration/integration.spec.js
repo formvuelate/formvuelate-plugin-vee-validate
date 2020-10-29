@@ -16,6 +16,18 @@ const FormText = {
   props: ['label', 'modelValue', 'validation']
 }
 
+const FormTextWithMeta = {
+  template: `
+    <div>
+      <input @input="$emit('update:modelValue', $event.target.value)" />
+      <span class="dirty">{{ validation.meta.dirty }}</span>
+      <span class="touched">{{ validation.meta.touched }}</span>
+    </div>
+  `,
+  emits: ['update:modelValue'],
+  props: ['label', 'modelValue', 'validation']
+}
+
 const FormTextWithProps = {
   template: `
     <div>
@@ -235,5 +247,146 @@ describe('FVL integration', () => {
     form.trigger('submit')
     await flushPromises()
     expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it('fills form errors with initial-errors attribute', async () => {
+    const schema = [
+      {
+        label: 'Email',
+        model: 'email',
+        component: FormText,
+      },
+      {
+        label: 'Password',
+        model: 'password',
+        component: FormText,
+      },
+    ]
+
+    const errors = {
+      email: 'wrong',
+      password: 'short'
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" :initial-errors="errors" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup() {
+        const formData = ref({})
+
+        return {
+          schema,
+          formData,
+          errors
+        }
+      }
+    })
+
+    await flushPromises();
+    const messages = wrapper.findAll('span')
+    expect(messages[0].text()).toBe('wrong')
+    expect(messages[1].text()).toBe('short')
+  })
+
+  it('assigns the dirty meta flag using initial-dirty attribute', async () => {
+    const schema = [
+      {
+        label: 'Email',
+        model: 'email',
+        component: FormTextWithMeta,
+      },
+      {
+        label: 'Password',
+        model: 'password',
+        component: FormTextWithMeta,
+      },
+    ]
+
+    const dirty = {
+      email: true,
+      password: false
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" :initial-dirty="dirty" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup() {
+        const formData = ref({})
+
+        return {
+          schema,
+          formData,
+          dirty
+        }
+      }
+    })
+
+    await flushPromises();
+    const dirtySpans = wrapper.findAll('.dirty')
+    expect(dirtySpans[0].text()).toBe('true')
+    expect(dirtySpans[1].text()).toBe('false')
+  })
+
+  it('assigns the touched meta flag using initial-touched attribute', async () => {
+    const schema = [
+      {
+        label: 'Email',
+        model: 'email',
+        component: FormTextWithMeta,
+      },
+      {
+        label: 'Password',
+        model: 'password',
+        component: FormTextWithMeta,
+      },
+    ]
+
+    const touched = {
+      email: true,
+      password: false
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" :initial-touched="touched" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup() {
+        const formData = ref({})
+
+        return {
+          schema,
+          formData,
+          touched
+        }
+      }
+    })
+
+    await flushPromises();
+    const touchedSpans = wrapper.findAll('.touched')
+    expect(touchedSpans[0].text()).toBe('true')
+    expect(touchedSpans[1].text()).toBe('false')
   })
 })

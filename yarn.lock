@@ -8238,10 +8238,10 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vee-validate@^4.0.0-beta.10:
-  version "4.0.0-beta.13"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.0.0-beta.13.tgz#4d5a1dcb7f2803118c7e5b92515b1503528488a2"
-  integrity sha512-3Ti3buJQKscRSwXQqop9XjfWM1vVlmF97NCXTZqclX/A9S4ZrYrllCO8E7YXicaxn9Cnhz8RyojSmyPqZp/x7Q==
+vee-validate@^4.0.0-beta.16:
+  version "4.0.0-beta.16"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.0.0-beta.16.tgz#561846a75b8ce86ed4df8ba837ab676c3553ec96"
+  integrity sha512-4CiQFq4MG/4XtahxC6HeggSYXxMoxQAhg/2Hw7JBtBcAkwFFQWGhnT+sZ2Y99ssmNuHgEwBpJBQHVDhbaqLVRw==
 
 vendors@^1.0.0:
   version "1.0.4"

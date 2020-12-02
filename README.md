@@ -2,7 +2,7 @@
 
 <p align="center">
     <img width="150px" src="https://avatars1.githubusercontent.com/u/68271974?s=200&v=4" title="FormVueLate logo">
-    <img width="150px" src="https://github.com/logaretm/vee-validate/raw/master/logo.png" title="Vee validate logo">
+    <img width="150px" src="https://github.com/logaretm/vee-validate/raw/main/logo.png" title="Vee validate logo">
 </p>
 
 Vee-validate plugin for FormVueLate

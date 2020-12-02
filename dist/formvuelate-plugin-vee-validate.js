@@ -103,16 +103,15 @@ function withField(el, mapProps) {
       var setDirty = ref$2.setDirty;
       var setTouched = ref$2.setTouched;
       var errors = ref$2.errors;
-      
+
       if (modelValue) {
         vue.watch(modelValue, function (val) {
           value.value = val;
         });
       }
 
-
-      return function renderWithField() {
-        return vue.h(Comp, Object.assign({}, props,
+      return function renderWithField () {
+        return vue.h(vue.resolveDynamicComponent(Comp), Object.assign({}, props,
           attrs,
           mapProps({
             errorMessage: vue.unref(errorMessage),

@@ -1,4 +1,4 @@
-import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref } from 'vue'
+import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref, resolveDynamicComponent } from 'vue'
 import { useForm, useField } from 'vee-validate';
 
 /**
@@ -85,16 +85,15 @@ export function withField(el, mapProps) {
       const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(attrs.model, validations, {
         initialValue
       })
-      
+
       if (modelValue) {
         watch(modelValue, (val) => {
           value.value = val
         })
       }
 
-
-      return function renderWithField() {
-        return h(Comp, {
+      return function renderWithField () {
+        return h(resolveDynamicComponent(Comp), {
           ...props,
           ...attrs,
           ...mapProps({

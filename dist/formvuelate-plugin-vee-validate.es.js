@@ -4,7 +4,7 @@
  * @license MIT
  */
 
-import { computed, getCurrentInstance, h, markRaw, toRefs, unref, watch } from 'vue';
+import { computed, getCurrentInstance, h, markRaw, resolveDynamicComponent, toRefs, unref, watch } from 'vue';
 import { useField, useForm } from 'vee-validate';
 
 /**
@@ -100,16 +100,15 @@ function withField(el, mapProps) {
       var setDirty = ref$2.setDirty;
       var setTouched = ref$2.setTouched;
       var errors = ref$2.errors;
-      
+
       if (modelValue) {
         watch(modelValue, function (val) {
           value.value = val;
         });
       }
 
-
-      return function renderWithField() {
-        return h(Comp, Object.assign({}, props,
+      return function renderWithField () {
+        return h(resolveDynamicComponent(Comp), Object.assign({}, props,
           attrs,
           mapProps({
             errorMessage: unref(errorMessage),

@@ -389,4 +389,50 @@ describe('FVL integration', () => {
     expect(touchedSpans[0].text()).toBe('true')
     expect(touchedSpans[1].text()).toBe('false')
   })
+
+  // #4
+  it('renders global components', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: 'form-text',
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        return {
+          schema,
+          formData
+        }
+      }
+    }, {
+      global: {
+        components: {
+          FormText
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe(REQUIRED_MESSAGE)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
 })

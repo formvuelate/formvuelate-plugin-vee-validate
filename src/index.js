@@ -1,5 +1,5 @@
-import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref } from 'vue'
-import { useForm, useField } from 'vee-validate';
+import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref, resolveDynamicComponent } from 'vue'
+import { useForm, useField } from 'vee-validate'
 
 /**
  * For a Schema, find the elements in each of the rows and remap the element with the given function
@@ -13,29 +13,29 @@ export const mapElementsInSchema = (schema, fn) => schema.map(row => row.map(el 
 /**
  * Maps the validation state to props
  */
-function defaultMapProps(validation) {
+function defaultMapProps (validation) {
   return {
-    validation,
-  };
+    validation
+  }
 }
 
-export default function VeeValidatePlugin(opts) {
+export default function VeeValidatePlugin (opts) {
   // Maps the validation state exposed by vee-validate to components
   const mapProps = (opts && opts.mapProps) || defaultMapProps
 
-  return function veeValidatePlugin(baseReturns) {
+  return function veeValidatePlugin (baseReturns) {
   // Take the parsed schema from SchemaForm setup returns
     const { parsedSchema, formBinds } = baseReturns
 
     // Get additional properties not defined on the `SchemaForm` derivatives
-    const { attrs: formAttrs } = getCurrentInstance();
+    const { attrs: formAttrs } = getCurrentInstance()
     // Create a form context and inject the validation schema if provided
     const { handleSubmit } = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema'],
-      initialErrors: formAttrs['initial-errors'] || formAttrs['initialErrors'],
-      initialDirty: formAttrs['initial-dirty'] || formAttrs['initialDirty'],
-      initialTouched: formAttrs['initial-touched'] || formAttrs['initialTouched'],
-    });
+      validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
+      initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
+      initialDirty: formAttrs['initial-dirty'] || formAttrs.initialDirty,
+      initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
+    })
 
     // Map components in schema to enhanced versions with `useField`
     const formSchema = mapElementsInSchema(parsedSchema.value, el => {
@@ -46,17 +46,17 @@ export default function VeeValidatePlugin(opts) {
     })
 
     // override the submit function with one that triggers validation
-    const formSubmit = formBinds.value.onSubmit;  
+    const formSubmit = formBinds.value.onSubmit
     const onSubmit = handleSubmit((_, { evt }) => {
-      formSubmit(evt);
-    });
+      formSubmit(evt)
+    })
 
     return {
       ...baseReturns,
       formBinds: computed(() => {
         return {
           ...baseReturns.formBinds.value,
-          onSubmit,
+          onSubmit
         }
       }),
       parsedSchema: computed(() => formSchema)
@@ -64,19 +64,19 @@ export default function VeeValidatePlugin(opts) {
   }
 }
 
-export function withField(el, mapProps) {
-  const Comp = el.component;
+export function withField (el, mapProps) {
+  const Comp = el.component
 
   return {
     name: 'withFieldWrapper',
     props: {
       modelValue: {
         type: [String, Number],
-        default: undefined,
+        default: undefined
       },
       validations: {
         type: [String, Object, Function],
-        default: undefined,
+        default: undefined
       }
     },
     setup (props, { attrs }) {
@@ -85,16 +85,15 @@ export function withField(el, mapProps) {
       const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(attrs.model, validations, {
         initialValue
       })
-      
+
       if (modelValue) {
         watch(modelValue, (val) => {
           value.value = val
         })
       }
 
-
-      return function renderWithField() {
-        return h(Comp, {
+      return function renderWithField () {
+        return h(resolveDynamicComponent(Comp), {
           ...props,
           ...attrs,
           ...mapProps({
@@ -102,10 +101,10 @@ export function withField(el, mapProps) {
             errors: unref(errors),
             meta,
             setDirty,
-            setTouched,
+            setTouched
           }, el)
         })
       }
-    },
+    }
   }
 }

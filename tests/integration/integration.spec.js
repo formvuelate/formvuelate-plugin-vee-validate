@@ -2,8 +2,8 @@ import veeValidatePlugin from '../../src/index.js'
 import { SchemaFormFactory } from 'formvuelate'
 import { mount } from '@vue/test-utils'
 import { markRaw, ref } from 'vue'
-import * as yup from 'yup';
-import flushPromises from 'flush-promises';
+import * as yup from 'yup'
+import flushPromises from 'flush-promises'
 
 const FormText = {
   template: `
@@ -51,8 +51,8 @@ describe('FVL integration', () => {
       firstName: {
         label: 'First Name',
         component: FormText,
-        validations: yup.string().required(REQUIRED_MESSAGE),
-      },
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
     }
 
     const SchemaWithValidation = SchemaFormFactory([
@@ -66,14 +66,14 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
-        const formData = ref({});
+      setup () {
+        const formData = ref({})
         return {
           schema,
           formData
         }
       }
-    });
+    })
 
     const input = wrapper.findComponent(FormText)
     input.setValue('')
@@ -90,15 +90,15 @@ describe('FVL integration', () => {
         label: 'First Name',
         model: 'firstName',
         component: FormTextWithProps,
-        validations: yup.string().required(REQUIRED_MESSAGE),
-      },
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
     ]
 
     const SchemaWithValidation = SchemaFormFactory([
       veeValidatePlugin({
         mapProps: (state) => {
           return {
-            errorMessage: state.errorMessage,
+            errorMessage: state.errorMessage
           }
         }
       })
@@ -111,14 +111,14 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
-        const formData = ref({});
+      setup () {
+        const formData = ref({})
         return {
           schema,
           formData
         }
       }
-    });
+    })
 
     const input = wrapper.findComponent(FormTextWithProps)
     input.setValue('')
@@ -134,13 +134,13 @@ describe('FVL integration', () => {
       {
         label: 'Email',
         model: 'email',
-        component: FormText,
+        component: FormText
       },
       {
         label: 'Password',
         model: 'password',
-        component: FormText,
-      },
+        component: FormText
+      }
     ]
 
     const SchemaWithValidation = SchemaFormFactory([
@@ -154,12 +154,12 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
-        const formData = ref({});
+      setup () {
+        const formData = ref({})
         const validationSchema = yup.object().shape({
           email: yup.string().email(EMAIL_MESSAGE).required(),
-          password: yup.string().min(4, MIN_MESSAGE).required(),
-        });
+          password: yup.string().min(4, MIN_MESSAGE).required()
+        })
 
         return {
           schema,
@@ -167,7 +167,7 @@ describe('FVL integration', () => {
           validationSchema
         }
       }
-    });
+    })
 
     const inputs = wrapper.findAllComponents(FormText)
     const errors = wrapper.findAll('span')
@@ -193,20 +193,20 @@ describe('FVL integration', () => {
       {
         label: 'Email',
         model: 'email',
-        component: FormText,
+        component: FormText
       },
       {
         label: 'Password',
         model: 'password',
-        component: FormText,
-      },
+        component: FormText
+      }
     ]
 
     const SchemaWithValidation = SchemaFormFactory([
       veeValidatePlugin()
     ])
 
-    const onSubmit = jest.fn();
+    const onSubmit = jest.fn()
 
     const wrapper = mount({
       template: `
@@ -215,28 +215,28 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
-        const formData = ref({});
+      setup () {
+        const formData = ref({})
         const validationSchema = yup.object().shape({
           email: yup.string().email(EMAIL_MESSAGE).required(),
-          password: yup.string().min(4, MIN_MESSAGE).required(),
-        });
+          password: yup.string().min(4, MIN_MESSAGE).required()
+        })
 
         return {
           schema,
           formData,
           validationSchema,
-          onSubmit,
+          onSubmit
         }
       }
-    });
+    })
 
     const inputs = wrapper.findAllComponents(FormText)
     const form = wrapper.find('form')
 
-    form.trigger('submit');
+    form.trigger('submit')
     await flushPromises()
-    expect(onSubmit).toHaveBeenCalledTimes(0);
+    expect(onSubmit).toHaveBeenCalledTimes(0)
 
     inputs[0].setValue('test@gmail.com')
     await flushPromises()
@@ -254,13 +254,13 @@ describe('FVL integration', () => {
       {
         label: 'Email',
         model: 'email',
-        component: FormText,
+        component: FormText
       },
       {
         label: 'Password',
         model: 'password',
-        component: FormText,
-      },
+        component: FormText
+      }
     ]
 
     const errors = {
@@ -279,7 +279,7 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
+      setup () {
         const formData = ref({})
 
         return {
@@ -290,7 +290,7 @@ describe('FVL integration', () => {
       }
     })
 
-    await flushPromises();
+    await flushPromises()
     const messages = wrapper.findAll('span')
     expect(messages[0].text()).toBe('wrong')
     expect(messages[1].text()).toBe('short')
@@ -301,13 +301,13 @@ describe('FVL integration', () => {
       {
         label: 'Email',
         model: 'email',
-        component: FormTextWithMeta,
+        component: FormTextWithMeta
       },
       {
         label: 'Password',
         model: 'password',
-        component: FormTextWithMeta,
-      },
+        component: FormTextWithMeta
+      }
     ]
 
     const dirty = {
@@ -326,7 +326,7 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
+      setup () {
         const formData = ref({})
 
         return {
@@ -337,7 +337,7 @@ describe('FVL integration', () => {
       }
     })
 
-    await flushPromises();
+    await flushPromises()
     const dirtySpans = wrapper.findAll('.dirty')
     expect(dirtySpans[0].text()).toBe('true')
     expect(dirtySpans[1].text()).toBe('false')
@@ -348,13 +348,13 @@ describe('FVL integration', () => {
       {
         label: 'Email',
         model: 'email',
-        component: FormTextWithMeta,
+        component: FormTextWithMeta
       },
       {
         label: 'Password',
         model: 'password',
-        component: FormTextWithMeta,
-      },
+        component: FormTextWithMeta
+      }
     ]
 
     const touched = {
@@ -373,7 +373,7 @@ describe('FVL integration', () => {
       components: {
         SchemaWithValidation
       },
-      setup() {
+      setup () {
         const formData = ref({})
 
         return {
@@ -384,9 +384,55 @@ describe('FVL integration', () => {
       }
     })
 
-    await flushPromises();
+    await flushPromises()
     const touchedSpans = wrapper.findAll('.touched')
     expect(touchedSpans[0].text()).toBe('true')
     expect(touchedSpans[1].text()).toBe('false')
+  })
+
+  // #4
+  it('renders global components', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: 'form-text',
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        return {
+          schema,
+          formData
+        }
+      }
+    }, {
+      global: {
+        components: {
+          FormText
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe(REQUIRED_MESSAGE)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
   })
 })

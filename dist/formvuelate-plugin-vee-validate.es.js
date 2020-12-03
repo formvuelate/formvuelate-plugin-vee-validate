@@ -4,7 +4,7 @@
  * @license MIT
  */
 
-import { computed, getCurrentInstance, h, markRaw, toRefs, unref, watch } from 'vue';
+import { computed, getCurrentInstance, h, markRaw, resolveDynamicComponent, toRefs, unref, watch } from 'vue';
 import { useField, useForm } from 'vee-validate';
 
 /**
@@ -19,17 +19,17 @@ var mapElementsInSchema = function (schema, fn) { return schema.map(function (ro
 /**
  * Maps the validation state to props
  */
-function defaultMapProps(validation) {
+function defaultMapProps (validation) {
   return {
-    validation: validation,
-  };
+    validation: validation
+  }
 }
 
-function VeeValidatePlugin(opts) {
+function VeeValidatePlugin (opts) {
   // Maps the validation state exposed by vee-validate to components
   var mapProps = (opts && opts.mapProps) || defaultMapProps;
 
-  return function veeValidatePlugin(baseReturns) {
+  return function veeValidatePlugin (baseReturns) {
   // Take the parsed schema from SchemaForm setup returns
     var parsedSchema = baseReturns.parsedSchema;
     var formBinds = baseReturns.formBinds;
@@ -39,10 +39,10 @@ function VeeValidatePlugin(opts) {
     var formAttrs = ref.attrs;
     // Create a form context and inject the validation schema if provided
     var ref$1 = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs['validationSchema'],
-      initialErrors: formAttrs['initial-errors'] || formAttrs['initialErrors'],
-      initialDirty: formAttrs['initial-dirty'] || formAttrs['initialDirty'],
-      initialTouched: formAttrs['initial-touched'] || formAttrs['initialTouched'],
+      validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
+      initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
+      initialDirty: formAttrs['initial-dirty'] || formAttrs.initialDirty,
+      initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
     });
     var handleSubmit = ref$1.handleSubmit;
 
@@ -53,7 +53,7 @@ function VeeValidatePlugin(opts) {
     });
 
     // override the submit function with one that triggers validation
-    var formSubmit = formBinds.value.onSubmit;  
+    var formSubmit = formBinds.value.onSubmit;
     var onSubmit = handleSubmit(function (_, ref) {
       var evt = ref.evt;
 
@@ -69,7 +69,7 @@ function VeeValidatePlugin(opts) {
   }
 }
 
-function withField(el, mapProps) {
+function withField (el, mapProps) {
   var Comp = el.component;
 
   return {
@@ -77,11 +77,11 @@ function withField(el, mapProps) {
     props: {
       modelValue: {
         type: [String, Number],
-        default: undefined,
+        default: undefined
       },
       validations: {
         type: [String, Object, Function],
-        default: undefined,
+        default: undefined
       }
     },
     setup: function setup (props, ref) {
@@ -100,26 +100,25 @@ function withField(el, mapProps) {
       var setDirty = ref$2.setDirty;
       var setTouched = ref$2.setTouched;
       var errors = ref$2.errors;
-      
+
       if (modelValue) {
         watch(modelValue, function (val) {
           value.value = val;
         });
       }
 
-
-      return function renderWithField() {
-        return h(Comp, Object.assign({}, props,
+      return function renderWithField () {
+        return h(resolveDynamicComponent(Comp), Object.assign({}, props,
           attrs,
           mapProps({
             errorMessage: unref(errorMessage),
             errors: unref(errors),
             meta: meta,
             setDirty: setDirty,
-            setTouched: setTouched,
+            setTouched: setTouched
           }, el)))
       }
-    },
+    }
   }
 }
 

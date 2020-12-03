@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v1.0.2
+ * @formvuelate/plugin-vee-validate v1.0.3
  * (c) 2020 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */

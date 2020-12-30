@@ -44,8 +44,16 @@ export default function VeeValidatePlugin (opts) {
       if (el.schema) {
         path = path ? `${path}.${el.model}` : el.model
 
+        // Make sure we only deal with schema arrays and not nested objects
+        const schemaArray = Array.isArray(el.schema) ? el.schema : Object.keys(el.schema).map(model => {
+          return {
+            model,
+            ...el.schema[model]
+          }
+        })
+
         return Object.assign({}, el, {
-          schema: el.schema.map(nestedField => mapField(nestedField, path))
+          schema: schemaArray.map(nestedField => mapField(nestedField, path))
         })
       }
 

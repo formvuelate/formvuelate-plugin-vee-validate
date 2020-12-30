@@ -49,11 +49,33 @@ function VeeValidatePlugin (opts) {
     });
     var handleSubmit = ref$1.handleSubmit;
 
+    function mapField (el, path) {
+      if ( path === void 0 ) path = '';
+
+      // Handles nested schemas
+      // doesn't treat nested forms as fields
+      // instead goes over their fields and maps them recursively
+      if (el.schema) {
+        path = path ? (path + "." + (el.model)) : el.model;
+
+        // Make sure we only deal with schema arrays and not nested objects
+        var schemaArray = Array.isArray(el.schema) ? el.schema : Object.keys(el.schema).map(function (model) {
+          return Object.assign({}, {model: model},
+            el.schema[model])
+        });
+
+        return Object.assign({}, el, {
+          schema: schemaArray.map(function (nestedField) { return mapField(nestedField, path); })
+        })
+      }
+
+      return Object.assign({}, el, {
+        component: vue.markRaw(withField(el, mapProps, path))
+      })
+    }
+
     // Map components in schema to enhanced versions with `useField`
-    var formSchema = mapElementsInSchema(parsedSchema.value, function (el) {
-      return Object.assign({}, el,
-        {component: vue.markRaw(withField(el, mapProps))})
-    });
+    var formSchema = mapElementsInSchema(parsedSchema.value, mapField);
 
     // override the submit function with one that triggers validation
     var formSubmit = formBinds.value.onSubmit;
@@ -72,7 +94,9 @@ function VeeValidatePlugin (opts) {
   }
 }
 
-function withField (el, mapProps) {
+function withField (el, mapProps, path) {
+  if ( path === void 0 ) path = '';
+
   var Comp = el.component;
 
   return {
@@ -94,7 +118,10 @@ function withField (el, mapProps) {
       var validations = ref$1.validations;
       var modelValue = ref$1.modelValue;
       var initialValue = modelValue ? modelValue.value : undefined;
-      var ref$2 = veeValidate.useField(attrs.model, validations, {
+      // Build a fully qualified field name using dot notation for nested fields
+      // ex: user.name
+      var name = path ? (path + "." + (attrs.model)) : attrs.model;
+      var ref$2 = veeValidate.useField(name, validations, {
         initialValue: initialValue
       });
       var value = ref$2.value;

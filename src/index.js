@@ -37,13 +37,33 @@ export default function VeeValidatePlugin (opts) {
       initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
     })
 
-    // Map components in schema to enhanced versions with `useField`
-    const formSchema = mapElementsInSchema(parsedSchema.value, el => {
-      return {
-        ...el,
-        component: markRaw(withField(el, mapProps))
+    function mapField (el, path = '') {
+      // Handles nested schemas
+      // doesn't treat nested forms as fields
+      // instead goes over their fields and maps them recursively
+      if (el.schema) {
+        path = path ? `${path}.${el.model}` : el.model
+
+        // Make sure we only deal with schema arrays and not nested objects
+        const schemaArray = Array.isArray(el.schema) ? el.schema : Object.keys(el.schema).map(model => {
+          return {
+            model,
+            ...el.schema[model]
+          }
+        })
+
+        return Object.assign({}, el, {
+          schema: schemaArray.map(nestedField => mapField(nestedField, path))
+        })
       }
-    })
+
+      return Object.assign({}, el, {
+        component: markRaw(withField(el, mapProps, path))
+      })
+    }
+
+    // Map components in schema to enhanced versions with `useField`
+    const formSchema = mapElementsInSchema(parsedSchema.value, mapField)
 
     // override the submit function with one that triggers validation
     const formSubmit = formBinds.value.onSubmit
@@ -64,7 +84,7 @@ export default function VeeValidatePlugin (opts) {
   }
 }
 
-export function withField (el, mapProps) {
+export function withField (el, mapProps, path = '') {
   const Comp = el.component
 
   return {
@@ -82,7 +102,10 @@ export function withField (el, mapProps) {
     setup (props, { attrs }) {
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
-      const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(attrs.model, validations, {
+      // Build a fully qualified field name using dot notation for nested fields
+      // ex: user.name
+      const name = path ? `${path}.${attrs.model}` : attrs.model
+      const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(name, validations, {
         initialValue
       })
 

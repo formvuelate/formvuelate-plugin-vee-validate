@@ -1,5 +1,5 @@
 import veeValidatePlugin from '../../src/index.js'
-import { SchemaFormFactory } from 'formvuelate'
+import { SchemaFormFactory, SchemaForm } from 'formvuelate'
 import { mount } from '@vue/test-utils'
 import { markRaw, ref } from 'vue'
 import * as yup from 'yup'
@@ -423,6 +423,95 @@ describe('FVL integration', () => {
       global: {
         components: {
           FormText
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe(REQUIRED_MESSAGE)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
+
+  it('validates nested fields with array schema', async () => {
+    const schema = {
+      user: {
+        component: SchemaForm,
+        model: 'subform',
+        schema: [
+          {
+            model: 'firstName',
+            label: 'First Name',
+            component: FormText,
+            validations: yup.string().required(REQUIRED_MESSAGE)
+          }
+        ]
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        return {
+          schema,
+          formData
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe(REQUIRED_MESSAGE)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
+
+  it('validates nested fields with object schema', async () => {
+    const schema = {
+      user: {
+        component: SchemaForm,
+        model: 'subform',
+        schema: {
+          firstName: {
+            label: 'First Name',
+            component: FormText,
+            validations: yup.string().required(REQUIRED_MESSAGE)
+          }
+        }
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        return {
+          schema,
+          formData
         }
       }
     })

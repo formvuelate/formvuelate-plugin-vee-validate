@@ -63,7 +63,7 @@ export default function VeeValidatePlugin (opts) {
     }
 
     // Map components in schema to enhanced versions with `useField`
-    const formSchema = mapElementsInSchema(parsedSchema.value, mapField)
+    const formSchemaWithVeeValidate = computed(() => mapElementsInSchema(parsedSchema.value, mapField))
 
     // override the submit function with one that triggers validation
     const formSubmit = formBinds.value.onSubmit
@@ -79,7 +79,7 @@ export default function VeeValidatePlugin (opts) {
           onSubmit
         }
       }),
-      parsedSchema: computed(() => formSchema)
+      parsedSchema: formSchemaWithVeeValidate
     }
   }
 }

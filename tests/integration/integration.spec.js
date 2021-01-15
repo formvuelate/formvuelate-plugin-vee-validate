@@ -1,7 +1,7 @@
 import veeValidatePlugin from '../../src/index.js'
 import { SchemaFormFactory, SchemaForm } from 'formvuelate'
 import { mount } from '@vue/test-utils'
-import { markRaw, ref } from 'vue'
+import { markRaw, ref, computed } from 'vue'
 import * as yup from 'yup'
 import flushPromises from 'flush-promises'
 
@@ -523,5 +523,61 @@ describe('FVL integration', () => {
     input.setValue('hello')
     await flushPromises()
     expect(wrapper.find('span').text()).toBe('')
+  })
+
+  it('preserves reactivity in computed schemas', async () => {
+    const toggle = ref('A')
+    const schema = computed(() => {
+      if (toggle.value === 'A') {
+        return {
+          firstName: {
+            label: 'First Name',
+            component: FormText,
+            validations: yup.string().required('NAME')
+          }
+        }
+      }
+
+      return {
+        email: {
+          label: 'Email',
+          component: FormText,
+          validations: yup.string().required('EMAIL')
+        }
+      }
+    })
+
+    const SchemaWithValidation = SchemaFormFactory([
+      veeValidatePlugin()
+    ])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" v-model="formData" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+
+        return {
+          schema,
+          formData
+        }
+      }
+    })
+
+    let input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('NAME')
+
+    toggle.value = 'B'
+    await flushPromises()
+    input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('EMAIL')
   })
 })

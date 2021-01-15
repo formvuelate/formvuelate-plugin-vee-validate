@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v1.0.4
+ * @formvuelate/plugin-vee-validate v1.0.5
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -75,7 +75,7 @@ function VeeValidatePlugin (opts) {
     }
 
     // Map components in schema to enhanced versions with `useField`
-    var formSchema = mapElementsInSchema(parsedSchema.value, mapField);
+    var formSchemaWithVeeValidate = vue.computed(function () { return mapElementsInSchema(parsedSchema.value, mapField); });
 
     // override the submit function with one that triggers validation
     var formSubmit = formBinds.value.onSubmit;
@@ -90,7 +90,7 @@ function VeeValidatePlugin (opts) {
         return Object.assign({}, baseReturns.formBinds.value,
           {onSubmit: onSubmit})
       }),
-      parsedSchema: vue.computed(function () { return formSchema; })})
+      parsedSchema: formSchemaWithVeeValidate})
   }
 }
 

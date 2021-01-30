@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v1.0.5
+ * @formvuelate/plugin-vee-validate v1.0.6
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -61,14 +61,17 @@ function VeeValidatePlugin (opts) {
             el.schema[model])
         });
 
-        return Object.assign({}, el, {
-          schema: schemaArray.map(function (nestedField) { return mapField(nestedField, path); })
-        })
+        return Object.assign({}, el,
+          {schema: schemaArray.map(function (nestedField) { return mapField(nestedField, path); })})
       }
 
-      return Object.assign({}, el, {
-        component: markRaw(withField(el, mapProps, path))
-      })
+      return Object.assign({}, el,
+        // namespaced prop to avoid clash with users' props
+        {_veeValidateConfig: {
+          mapProps: mapProps,
+          path: path
+        },
+        component: withField(el)})
     }
 
     // Map components in schema to enhanced versions with `useField`
@@ -91,12 +94,18 @@ function VeeValidatePlugin (opts) {
   }
 }
 
-function withField (el, mapProps, path) {
-  if ( path === void 0 ) path = '';
+// Used to track if a component was already marked
+// very important to avoid re-creating components when re-rendering
+var COMPONENT_LOOKUP = new Map();
 
+function withField (el) {
   var Comp = el.component;
 
-  return {
+  if (COMPONENT_LOOKUP.has(Comp)) {
+    return COMPONENT_LOOKUP.get(Comp)
+  }
+
+  var wrappedComponent = markRaw({
     name: 'withFieldWrapper',
     props: {
       modelValue: {
@@ -106,27 +115,34 @@ function withField (el, mapProps, path) {
       validations: {
         type: [String, Object, Function],
         default: undefined
+      },
+      _veeValidateConfig: {
+        type: Object,
+        required: true
       }
     },
-    setup: function setup (props, ref) {
+    setup: function setup(props, ref) {
       var attrs = ref.attrs;
 
-      var ref$1 = toRefs(props);
-      var validations = ref$1.validations;
-      var modelValue = ref$1.modelValue;
+      var ref$1 = props._veeValidateConfig;
+      var path = ref$1.path;
+      var mapProps = ref$1.mapProps;
+      var ref$2 = toRefs(props);
+      var validations = ref$2.validations;
+      var modelValue = ref$2.modelValue;
       var initialValue = modelValue ? modelValue.value : undefined;
       // Build a fully qualified field name using dot notation for nested fields
       // ex: user.name
       var name = path ? (path + "." + (attrs.model)) : attrs.model;
-      var ref$2 = useField(name, validations, {
+      var ref$3 = useField(name, validations, {
         initialValue: initialValue
       });
-      var value = ref$2.value;
-      var errorMessage = ref$2.errorMessage;
-      var meta = ref$2.meta;
-      var setDirty = ref$2.setDirty;
-      var setTouched = ref$2.setTouched;
-      var errors = ref$2.errors;
+      var value = ref$3.value;
+      var errorMessage = ref$3.errorMessage;
+      var meta = ref$3.meta;
+      var setDirty = ref$3.setDirty;
+      var setTouched = ref$3.setTouched;
+      var errors = ref$3.errors;
 
       if (modelValue) {
         watch(modelValue, function (val) {
@@ -134,8 +150,10 @@ function withField (el, mapProps, path) {
         });
       }
 
-      return function renderWithField () {
-        return h(resolveDynamicComponent(Comp), Object.assign({}, props,
+      var resolvedComponent = resolveDynamicComponent(Comp);
+
+      return function renderWithField() {
+        return h(resolvedComponent, Object.assign({}, props,
           attrs,
           mapProps({
             errorMessage: unref(errorMessage),
@@ -146,7 +164,12 @@ function withField (el, mapProps, path) {
           }, el)))
       }
     }
-  }
+  });
+
+  // Assign it to the cache to avoid re-creating it
+  COMPONENT_LOOKUP.set(Comp, wrappedComponent);
+
+  return wrappedComponent
 }
 
 export { mapElementsInSchema, withField };

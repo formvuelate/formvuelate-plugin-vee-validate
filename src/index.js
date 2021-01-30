@@ -52,14 +52,21 @@ export default function VeeValidatePlugin (opts) {
           }
         })
 
-        return Object.assign({}, el, {
+        return {
+          ...el,
           schema: schemaArray.map(nestedField => mapField(nestedField, path))
-        })
+        }
       }
 
-      return Object.assign({}, el, {
-        component: markRaw(withField(el, mapProps, path))
-      })
+      return {
+        ...el,
+        // namespaced prop to avoid clash with users' props
+        _veeValidateConfig: {
+          mapProps,
+          path
+        },
+        component: withField(el)
+      }
     }
 
     // Map components in schema to enhanced versions with `useField`
@@ -84,10 +91,18 @@ export default function VeeValidatePlugin (opts) {
   }
 }
 
-export function withField (el, mapProps, path = '') {
+// Used to track if a component was already marked
+// very important to avoid re-creating components when re-rendering
+const COMPONENT_LOOKUP = new Map()
+
+export function withField (el) {
   const Comp = el.component
 
-  return {
+  if (COMPONENT_LOOKUP.has(Comp)) {
+    return COMPONENT_LOOKUP.get(Comp)
+  }
+
+  const wrappedComponent = markRaw({
     name: 'withFieldWrapper',
     props: {
       modelValue: {
@@ -97,9 +112,14 @@ export function withField (el, mapProps, path = '') {
       validations: {
         type: [String, Object, Function],
         default: undefined
+      },
+      _veeValidateConfig: {
+        type: Object,
+        required: true
       }
     },
-    setup (props, { attrs }) {
+    setup(props, { attrs }) {
+      const { path, mapProps } = props._veeValidateConfig
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
       // Build a fully qualified field name using dot notation for nested fields
@@ -115,8 +135,10 @@ export function withField (el, mapProps, path = '') {
         })
       }
 
-      return function renderWithField () {
-        return h(resolveDynamicComponent(Comp), {
+      const resolvedComponent = resolveDynamicComponent(Comp)
+
+      return function renderWithField() {
+        return h(resolvedComponent, {
           ...props,
           ...attrs,
           ...mapProps({
@@ -129,5 +151,10 @@ export function withField (el, mapProps, path = '') {
         })
       }
     }
-  }
+  })
+
+  // Assign it to the cache to avoid re-creating it
+  COMPONENT_LOOKUP.set(Comp, wrappedComponent)
+
+  return wrappedComponent
 }

@@ -118,7 +118,7 @@ export function withField (el) {
         required: true
       }
     },
-    setup(props, { attrs }) {
+    setup (props, { attrs }) {
       const { path, mapProps } = props._veeValidateConfig
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
@@ -137,7 +137,7 @@ export function withField (el) {
 
       const resolvedComponent = resolveDynamicComponent(Comp)
 
-      return function renderWithField() {
+      return function renderWithField () {
         return h(resolvedComponent, {
           ...props,
           ...attrs,

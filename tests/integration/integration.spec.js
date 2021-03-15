@@ -294,51 +294,46 @@ describe('FVL integration', () => {
     expect(messages[1].text()).toBe('short')
   })
 
-  // it('assigns the dirty meta flag if input value was changed', async () => {
-  //   const schema = [
-  //     {
-  //       label: 'Email',
-  //       model: 'email',
-  //       component: FormTextWithMeta
-  //     },
-  //     {
-  //       label: 'Password',
-  //       model: 'password',
-  //       component: FormTextWithMeta
-  //     }
-  //   ]
+  it('assigns the dirty meta flag if input value was changed', async () => {
+    const schema = [
+      {
+        label: 'Email',
+        model: 'email',
+        component: FormTextWithMeta
+      },
+      {
+        label: 'Password',
+        model: 'password',
+        component: FormTextWithMeta
+      }
+    ]
 
-  //   const dirty = {
-  //     email: true,
-  //     password: false
-  //   }
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
 
-  //   const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+        return {
+          schema
+        }
+      }
+    })
 
-  //   const wrapper = mount({
-  //     template: `
-  //       <SchemaWithValidation :schema="schema" :initial-dirty="dirty" />
-  //     `,
-  //     components: {
-  //       SchemaWithValidation
-  //     },
-  //     setup () {
-  //       const formData = ref({})
-  //       useSchemaForm(formData)
-
-  //       return {
-  //         schema,
-  //         formData,
-  //         dirty
-  //       }
-  //     }
-  //   })
-
-  //   await flushPromises()
-  //   const dirtySpans = wrapper.findAll('.dirty')
-  //   expect(dirtySpans[0].text()).toBe('true')
-  //   expect(dirtySpans[1].text()).toBe('false')
-  // })
+    await flushPromises()
+    const input = wrapper.findComponent(FormTextWithMeta)
+    await input.setValue('')
+    await flushPromises()
+    const dirtySpans = wrapper.findAll('.dirty')
+    expect(dirtySpans[0].text()).toBe('true')
+    expect(dirtySpans[1].text()).toBe('false')
+  })
 
   it('assigns the touched meta flag using initial-touched attribute', async () => {
     const schema = [
@@ -374,7 +369,6 @@ describe('FVL integration', () => {
 
         return {
           schema,
-          formData,
           touched
         }
       }

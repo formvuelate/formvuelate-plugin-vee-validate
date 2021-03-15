@@ -33,7 +33,6 @@ export default function VeeValidatePlugin (opts) {
     const { handleSubmit } = useForm({
       validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
       initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
-      initialDirty: formAttrs['initial-dirty'] || formAttrs.initialDirty,
       initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
     })
 

@@ -44,7 +44,6 @@ export default function VeeValidatePlugin (opts) {
       provide(VEE_VALIDATE_FVL_FORM_KEY, formContext)
     }
 
-    // Create a form context and inject the validation schema if provided
     const { handleSubmit } = formContext
 
     function mapField (el, path = '') {

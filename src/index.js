@@ -1,4 +1,4 @@
-import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref, resolveDynamicComponent } from 'vue'
+import { toRefs, h, computed, markRaw, watch, getCurrentInstance, unref, resolveDynamicComponent, inject, provide } from 'vue'
 import { useForm, useField } from 'vee-validate'
 
 /**
@@ -19,6 +19,8 @@ function defaultMapProps (validation) {
   }
 }
 
+const VEE_VALIDATE_FVL_FORM_KEY = 'vee-validate-fvl-form-context'
+
 export default function VeeValidatePlugin (opts) {
   // Maps the validation state exposed by vee-validate to components
   const mapProps = (opts && opts.mapProps) || defaultMapProps
@@ -29,13 +31,20 @@ export default function VeeValidatePlugin (opts) {
 
     // Get additional properties not defined on the `SchemaForm` derivatives
     const { attrs: formAttrs } = getCurrentInstance()
-    // Create a form context and inject the validation schema if provided
-    const { handleSubmit } = useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
-      initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
-      initialDirty: formAttrs['initial-dirty'] || formAttrs.initialDirty,
-      initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
-    })
+    // try to retrieve vee-validate form from the root schema if possible
+    let formContext = inject(VEE_VALIDATE_FVL_FORM_KEY, undefined)
+    if (!formContext) {
+      // if non-existent create one and provide it for nested schemas
+      formContext = useForm({
+        validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
+        initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
+        initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
+      })
+
+      provide(VEE_VALIDATE_FVL_FORM_KEY, formContext)
+    }
+
+    const { handleSubmit } = formContext
 
     function mapField (el, path = '') {
       // Handles nested schemas
@@ -118,7 +127,7 @@ export function withField (el) {
         required: true
       }
     },
-    setup(props, { attrs }) {
+    setup (props, { attrs }) {
       const { path, mapProps } = props._veeValidateConfig
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
@@ -137,7 +146,7 @@ export function withField (el) {
 
       const resolvedComponent = resolveDynamicComponent(Comp)
 
-      return function renderWithField() {
+      return function renderWithField () {
         return h(resolvedComponent, {
           ...props,
           ...attrs,

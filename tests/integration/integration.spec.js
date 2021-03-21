@@ -1,5 +1,5 @@
 import veeValidatePlugin from '../../src/index.js'
-import { SchemaFormFactory, SchemaForm } from 'formvuelate'
+import { SchemaFormFactory, useSchemaForm } from 'formvuelate'
 import { mount } from '@vue/test-utils'
 import { markRaw, ref, computed } from 'vue'
 import * as yup from 'yup'
@@ -55,22 +55,21 @@ describe('FVL integration', () => {
       }
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
+
         return {
-          schema,
-          formData
+          schema
         }
       }
     })
@@ -106,16 +105,17 @@ describe('FVL integration', () => {
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
+
         return {
-          schema,
-          formData
+          schema
         }
       }
     })
@@ -143,19 +143,19 @@ describe('FVL integration', () => {
       }
     ]
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" :validation-schema="validationSchema" />
+        <SchemaWithValidation :schema="schema" :validation-schema="validationSchema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
+
         const validationSchema = yup.object().shape({
           email: yup.string().email(EMAIL_MESSAGE).required(),
           password: yup.string().min(4, MIN_MESSAGE).required()
@@ -202,21 +202,20 @@ describe('FVL integration', () => {
       }
     ]
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
     const onSubmit = jest.fn()
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" :validation-schema="validationSchema" @submit.prevent="onSubmit" />
+        <SchemaWithValidation :schema="schema" :validation-schema="validationSchema" @submit.prevent="onSubmit" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
         const validationSchema = yup.object().shape({
           email: yup.string().email(EMAIL_MESSAGE).required(),
           password: yup.string().min(4, MIN_MESSAGE).required()
@@ -268,19 +267,18 @@ describe('FVL integration', () => {
       password: 'short'
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" :initial-errors="errors" />
+        <SchemaWithValidation :schema="schema" :initial-errors="errors" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
 
         return {
           schema,
@@ -296,7 +294,7 @@ describe('FVL integration', () => {
     expect(messages[1].text()).toBe('short')
   })
 
-  it('assigns the dirty meta flag using initial-dirty attribute', async () => {
+  it('assigns the dirty meta flag if input value was changed', async () => {
     const schema = [
       {
         label: 'Email',
@@ -310,33 +308,27 @@ describe('FVL integration', () => {
       }
     ]
 
-    const dirty = {
-      email: true,
-      password: false
-    }
-
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
-
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" :initial-dirty="dirty" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
 
         return {
-          schema,
-          formData,
-          dirty
+          schema
         }
       }
     })
 
+    await flushPromises()
+    const input = wrapper.findComponent(FormTextWithMeta)
+    await input.setValue('')
     await flushPromises()
     const dirtySpans = wrapper.findAll('.dirty')
     expect(dirtySpans[0].text()).toBe('true')
@@ -362,23 +354,21 @@ describe('FVL integration', () => {
       password: false
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" :initial-touched="touched" />
+        <SchemaWithValidation :schema="schema" :initial-touched="touched" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
 
         return {
           schema,
-          formData,
           touched
         }
       }
@@ -400,32 +390,32 @@ describe('FVL integration', () => {
       }
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
 
-    const wrapper = mount({
-
-      template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+    const wrapper = mount(
+      {
+        template: `
+        <SchemaWithValidation :schema="schema" />
       `,
-      components: {
-        SchemaWithValidation
-      },
-      setup () {
-        const formData = ref({})
-        return {
-          schema,
-          formData
-        }
-      }
-    }, {
-      global: {
         components: {
-          FormText
+          SchemaWithValidation
+        },
+        setup () {
+          const formData = ref({})
+          useSchemaForm(formData)
+          return {
+            schema
+          }
+        }
+      },
+      {
+        global: {
+          components: {
+            FormText
+          }
         }
       }
-    })
+    )
 
     const input = wrapper.findComponent(FormText)
     input.setValue('')
@@ -437,9 +427,10 @@ describe('FVL integration', () => {
   })
 
   it('validates nested fields with array schema', async () => {
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
     const schema = {
       user: {
-        component: SchemaForm,
+        component: SchemaWithValidation,
         model: 'subform',
         schema: [
           {
@@ -452,22 +443,19 @@ describe('FVL integration', () => {
       }
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
-
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
+
         return {
-          schema,
-          formData
+          schema
         }
       }
     })
@@ -482,9 +470,10 @@ describe('FVL integration', () => {
   })
 
   it('validates nested fields with object schema', async () => {
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
     const schema = {
       user: {
-        component: SchemaForm,
+        component: SchemaWithValidation,
         model: 'subform',
         schema: {
           firstName: {
@@ -496,22 +485,19 @@ describe('FVL integration', () => {
       }
     }
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
-
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
+
         return {
-          schema,
-          formData
+          schema
         }
       }
     })
@@ -527,6 +513,7 @@ describe('FVL integration', () => {
 
   it('preserves reactivity in computed schemas', async () => {
     const toggle = ref('A')
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
     const schema = computed(() => {
       if (toggle.value === 'A') {
         return {
@@ -547,23 +534,19 @@ describe('FVL integration', () => {
       }
     })
 
-    const SchemaWithValidation = SchemaFormFactory([
-      veeValidatePlugin()
-    ])
-
     const wrapper = mount({
       template: `
-        <SchemaWithValidation :schema="schema" v-model="formData" />
+        <SchemaWithValidation :schema="schema" />
       `,
       components: {
         SchemaWithValidation
       },
       setup () {
         const formData = ref({})
+        useSchemaForm(formData)
 
         return {
-          schema,
-          formData
+          schema
         }
       }
     })

@@ -35,7 +35,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "flush-promises": "^1.0.2",
-    "formvuelate": "^3.0.0-beta.7",
+    "formvuelate": "^3.0.0",
     "jest": "^26.6.3",
     "rollit": "^0.0.9",
     "vee-validate": "^4.0.0-beta.16",
@@ -44,9 +44,9 @@
     "yup": "^0.29.3"
   },
   "peerDependencies": {
-    "formvuelate": "^2.0.0-beta.3",
+    "formvuelate": "^3.0.0",
     "vee-validate": "^4.0.0-beta.16",
-    "vue": "^3.0.0-beta.12"
+    "vue": "^3.0.0"
   },
   "files": [
     "src/*",

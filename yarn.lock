@@ -3490,10 +3490,10 @@ form-data@~2.3.2:
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
-formvuelate@^3.0.0-beta.7:
-  version "3.0.0-beta.7"
-  resolved "https://registry.yarnpkg.com/formvuelate/-/formvuelate-3.0.0-beta.7.tgz#888b49be5dea5e405edc7310ae8f5539387b9629"
-  integrity sha512-mg0ZGZmTw+rLZTvaASnIWQwS+6RIn2B07pjZ1W41Kcd+7EqTLmaq/I8pMDL9/DSUZpz/ohSOa837aZw9HrsvYA==
+formvuelate@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/formvuelate/-/formvuelate-3.0.0.tgz#79e2bec2f3bf4f8596b789b6ea339fa405af62da"
+  integrity sha512-y12RSRgdGJdCj9qLObwyYoY2ut6dfkI8bbrDlw0ot1SLYoiLxKmDB0NZtjPm6FPDdvxHwq7lFPJuroK6XEJJbQ==
 
 fragment-cache@^0.2.1:
   version "0.2.1"

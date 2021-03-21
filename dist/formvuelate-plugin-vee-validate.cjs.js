@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v1.0.6
+ * @formvuelate/plugin-vee-validate v2.0.0
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -29,6 +29,8 @@ function defaultMapProps (validation) {
   }
 }
 
+var VEE_VALIDATE_FVL_FORM_KEY = 'vee-validate-fvl-form-context';
+
 function VeeValidatePlugin (opts) {
   // Maps the validation state exposed by vee-validate to components
   var mapProps = (opts && opts.mapProps) || defaultMapProps;
@@ -41,14 +43,20 @@ function VeeValidatePlugin (opts) {
     // Get additional properties not defined on the `SchemaForm` derivatives
     var ref = vue.getCurrentInstance();
     var formAttrs = ref.attrs;
-    // Create a form context and inject the validation schema if provided
-    var ref$1 = veeValidate.useForm({
-      validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
-      initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
-      initialDirty: formAttrs['initial-dirty'] || formAttrs.initialDirty,
-      initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
-    });
-    var handleSubmit = ref$1.handleSubmit;
+    // try to retrieve vee-validate form from the root schema if possible
+    var formContext = vue.inject(VEE_VALIDATE_FVL_FORM_KEY, undefined);
+    if (!formContext) {
+      // if non-existent create one and provide it for nested schemas
+      formContext = veeValidate.useForm({
+        validationSchema: formAttrs['validation-schema'] || formAttrs.validationSchema,
+        initialErrors: formAttrs['initial-errors'] || formAttrs.initialErrors,
+        initialTouched: formAttrs['initial-touched'] || formAttrs.initialTouched
+      });
+
+      vue.provide(VEE_VALIDATE_FVL_FORM_KEY, formContext);
+    }
+
+    var handleSubmit = formContext.handleSubmit;
 
     function mapField (el, path) {
       if ( path === void 0 ) path = '';
@@ -125,7 +133,7 @@ function withField (el) {
         required: true
       }
     },
-    setup: function setup(props, ref) {
+    setup: function setup (props, ref) {
       var attrs = ref.attrs;
 
       var ref$1 = props._veeValidateConfig;
@@ -156,7 +164,7 @@ function withField (el) {
 
       var resolvedComponent = vue.resolveDynamicComponent(Comp);
 
-      return function renderWithField() {
+      return function renderWithField () {
         return vue.h(resolvedComponent, Object.assign({}, props,
           attrs,
           mapProps({

@@ -45,7 +45,7 @@
   },
   "peerDependencies": {
     "formvuelate": "^3.0.0",
-    "vee-validate": "^4.0.0-beta.16",
+    "vee-validate": "^4.2.0",
     "vue": "^3.0.0"
   },
   "files": [

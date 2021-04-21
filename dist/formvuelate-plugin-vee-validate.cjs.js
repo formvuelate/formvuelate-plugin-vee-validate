@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v2.2.0
+ * @formvuelate/plugin-vee-validate v2.2.1
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -121,7 +121,7 @@ function withField (el) {
     name: 'withFieldWrapper',
     props: {
       modelValue: {
-        type: [String, Number],
+        type: null,
         default: undefined
       },
       validations: {

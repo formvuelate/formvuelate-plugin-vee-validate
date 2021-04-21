@@ -115,7 +115,7 @@ export function withField (el) {
     name: 'withFieldWrapper',
     props: {
       modelValue: {
-        type: [String, Number],
+        type: null,
         default: undefined
       },
       validations: {

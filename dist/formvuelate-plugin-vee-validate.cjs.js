@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v2.1.0
+ * @formvuelate/plugin-vee-validate v2.2.0
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -152,7 +152,6 @@ function withField (el) {
       var value = ref$3.value;
       var errorMessage = ref$3.errorMessage;
       var meta = ref$3.meta;
-      var setDirty = ref$3.setDirty;
       var setTouched = ref$3.setTouched;
       var errors = ref$3.errors;
 
@@ -171,7 +170,6 @@ function withField (el) {
             errorMessage: vue.unref(errorMessage),
             errors: vue.unref(errors),
             meta: meta,
-            setDirty: setDirty,
             setTouched: setTouched
           }, el)))
       }

@@ -134,7 +134,7 @@ export function withField (el) {
       // Build a fully qualified field name using dot notation for nested fields
       // ex: user.name
       const name = path ? `${path}.${attrs.model}` : attrs.model
-      const { value, errorMessage, meta, setDirty, setTouched, errors } = useField(name, validations, {
+      const { value, errorMessage, meta, setTouched, errors } = useField(name, validations, {
         initialValue
       })
 
@@ -154,7 +154,6 @@ export function withField (el) {
             errorMessage: unref(errorMessage),
             errors: unref(errors),
             meta,
-            setDirty,
             setTouched
           }, el)
         })

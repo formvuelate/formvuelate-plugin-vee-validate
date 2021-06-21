@@ -563,4 +563,98 @@ describe('FVL integration', () => {
     await flushPromises()
     expect(wrapper.find('span').text()).toBe('EMAIL')
   })
+
+  it('exposes form-level validation state on afterForm slot', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: FormText,
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema">
+        
+          <template #afterForm="{ validation }">
+            <span id="error">{{ validation.errors.firstName }}</span>
+            <button :disabled="!validation.meta.valid"></button>
+          </template>
+        </SchemaWithValidation>
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    await flushPromises()
+    const input = wrapper.findComponent(FormText)
+    const button = wrapper.find('button')
+    expect(button.element.disabled).toBe(true)
+    await input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('#error').text()).toBe(REQUIRED_MESSAGE)
+    await input.setValue('hi')
+    await flushPromises()
+    expect(button.element.disabled).toBe(false)
+    expect(wrapper.find('#error').text()).toBe('')
+  })
+
+  it('exposes form-level validation state on beforeForm slot', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: FormText,
+        validations: yup.string().required(REQUIRED_MESSAGE)
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema">
+        
+          <template #beforeForm="{ validation }">
+            <span id="error">{{ validation.errors.firstName }}</span>
+            <button :disabled="!validation.meta.valid"></button>
+          </template>
+        </SchemaWithValidation>
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    await flushPromises()
+    const input = wrapper.findComponent(FormText)
+    const button = wrapper.find('button')
+    expect(button.element.disabled).toBe(true)
+    await input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('#error').text()).toBe(REQUIRED_MESSAGE)
+    await input.setValue('hi')
+    await flushPromises()
+    expect(button.element.disabled).toBe(false)
+    expect(wrapper.find('#error').text()).toBe('')
+  })
 })

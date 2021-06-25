@@ -3491,9 +3491,9 @@ form-data@~2.3.2:
     mime-types "^2.1.12"
 
 formvuelate@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/formvuelate/-/formvuelate-3.0.1.tgz#4a773572bf9c40ab840ed586090a37569b5c0882"
-  integrity sha512-fqbZxxmVistiH+7AJGjA0t8wy1kOI0EF3UVOMNVjLXvxp/pvlMl5EkB3MRNLUsZK8aWLcLvBzyrhBrQkjmRihQ==
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/formvuelate/-/formvuelate-3.2.1.tgz#50d93db3d519bbabe3f8d6a205dbc875665b2a02"
+  integrity sha512-ssmywvYbyWYu764Vzwgp1U/TXycAnaiOpFM/CmEcFX7S0fVbOx3EDfNeSFo4zDxrRZjJol0RvdjM3Rp1KgWPjg==
 
 fragment-cache@^0.2.1:
   version "0.2.1"
@@ -8277,9 +8277,9 @@ validate-npm-package-license@^3.0.1:
     spdx-expression-parse "^3.0.0"
 
 vee-validate@^4.0.0-beta.16:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.2.3.tgz#025b2a6eda555b8c28a33f1eed099fedfe13bcbe"
-  integrity sha512-Jh8IwktWPS7dMVLKMHfOr1ojEL5N2qiesSiUe7ASgKvMcvAvFH2sEN8xMKsSu78177yVouj4P8SwNlfp/9IqNw==
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.4.5.tgz#6e3db8266620d085835b8003ec088677fd3accf8"
+  integrity sha512-rewjEOZEPmUGWOnAKW3/HzRWLl9AHz4ESdcPoWLtA5RW0mnKOLfXlLre1Wrw0FopJlzN1Hc93GU4ji/3Kx1RPw==
 
 vendors@^1.0.0:
   version "1.0.4"

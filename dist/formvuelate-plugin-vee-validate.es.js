@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v2.2.1
+ * @formvuelate/plugin-vee-validate v2.3.0
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -97,6 +97,16 @@ function VeeValidatePlugin (opts) {
       {formBinds: computed(function () {
         return Object.assign({}, baseReturns.formBinds.value,
           {onSubmit: onSubmit})
+      }),
+      slotBinds: computed(function () {
+        return Object.assign({}, baseReturns.slotBinds.value,
+          {validation: {
+            errors: formContext.errors.value,
+            values: formContext.values,
+            isSubmitting: formContext.isSubmitting.value,
+            submitCount: formContext.submitCount.value,
+            meta: formContext.meta.value
+          }})
       }),
       parsedSchema: formSchemaWithVeeValidate})
   }

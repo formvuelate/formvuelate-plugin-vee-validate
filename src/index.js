@@ -95,6 +95,18 @@ export default function VeeValidatePlugin (opts) {
           onSubmit
         }
       }),
+      slotBinds: computed(() => {
+        return {
+          ...baseReturns.slotBinds.value,
+          validation: {
+            errors: formContext.errors.value,
+            values: formContext.values,
+            isSubmitting: formContext.isSubmitting.value,
+            submitCount: formContext.submitCount.value,
+            meta: formContext.meta.value
+          }
+        }
+      }),
       parsedSchema: formSchemaWithVeeValidate
     }
   }

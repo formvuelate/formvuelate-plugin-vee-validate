@@ -143,11 +143,13 @@ export function withField (el) {
       const { path, mapProps } = props._veeValidateConfig
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
+      const label = attrs.label ? attrs.label : undefined
       // Build a fully qualified field name using dot notation for nested fields
       // ex: user.name
       const name = path ? `${path}.${attrs.model}` : attrs.model
       const { value, errorMessage, meta, setTouched, errors } = useField(name, validations, {
-        initialValue
+        initialValue,
+        label
       })
 
       if (modelValue) {

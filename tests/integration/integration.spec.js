@@ -83,6 +83,44 @@ describe('FVL integration', () => {
     expect(wrapper.find('span').text()).toBe('')
   })
 
+  it('renders label in error messages', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: FormText,
+        validations: yup.string().required().label('First Name')
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    console.log(wrapper.find('span').text())
+    expect(wrapper.find('span').text()).toMatch(/First Name/)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
+
   it('maps validation state to props', async () => {
     const schema = [
       {

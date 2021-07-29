@@ -126,6 +126,10 @@ export function withField (el) {
   const wrappedComponent = markRaw({
     name: 'withFieldWrapper',
     props: {
+      label: {
+        type: String,
+        default: undefined
+      },
       modelValue: {
         type: null,
         default: undefined
@@ -143,11 +147,13 @@ export function withField (el) {
       const { path, mapProps } = props._veeValidateConfig
       const { validations, modelValue } = toRefs(props)
       const initialValue = modelValue ? modelValue.value : undefined
+      const label = computed(() => props.label)
       // Build a fully qualified field name using dot notation for nested fields
       // ex: user.name
       const name = path ? `${path}.${attrs.model}` : attrs.model
       const { value, errorMessage, meta, setTouched, errors } = useField(name, validations, {
-        initialValue
+        initialValue,
+        label
       })
 
       if (modelValue) {

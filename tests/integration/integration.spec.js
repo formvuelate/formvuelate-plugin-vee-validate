@@ -83,6 +83,43 @@ describe('FVL integration', () => {
     expect(wrapper.find('span').text()).toBe('')
   })
 
+  it('renders label in error messages', async () => {
+    const schema = {
+      firstName: {
+        label: 'First Name',
+        component: FormText,
+        validations: yup.string().required().label('First Name')
+      }
+    }
+
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    const input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toMatch(/First Name/)
+    input.setValue('hello')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toBe('')
+  })
+
   it('maps validation state to props', async () => {
     const schema = [
       {
@@ -562,6 +599,59 @@ describe('FVL integration', () => {
     input.setValue('')
     await flushPromises()
     expect(wrapper.find('span').text()).toBe('EMAIL')
+  })
+
+  it('preserves reactivity in computed schemas with labels', async () => {
+    const toggle = ref('A')
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+    const schema = computed(() => {
+      if (toggle.value === 'A') {
+        return {
+          firstName: {
+            label: 'First Name',
+            component: FormText,
+            validations: yup.string().required().label('First Name')
+          }
+        }
+      }
+
+      return {
+        email: {
+          label: 'Email Address',
+          component: FormText,
+          validations: yup.string().required().label('Email Address')
+        }
+      }
+    })
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    let input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toMatch(/First Name/)
+
+    toggle.value = 'B'
+    await flushPromises()
+    input = wrapper.findComponent(FormText)
+    input.setValue('')
+    await flushPromises()
+    expect(wrapper.find('span').text()).toMatch(/Email Address/)
   })
 
   it('exposes form-level validation state on afterForm slot', async () => {

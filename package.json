@@ -1,6 +1,6 @@
 {
   "name": "@formvuelate/plugin-vee-validate",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "FormVueLate Vee-validate plugin",
   "main": "dist/formvuelate-plugin-vee-validate.cjs.js",
   "private": false,

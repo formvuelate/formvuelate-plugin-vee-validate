@@ -1,5 +1,5 @@
 /**
- * @formvuelate/plugin-vee-validate v2.3.0
+ * @formvuelate/plugin-vee-validate v2.4.0
  * (c) 2021 Abdelrahman Awad <logaretm1@gmail.com>
  * @license MIT
  */
@@ -126,6 +126,10 @@ function withField (el) {
   var wrappedComponent = markRaw({
     name: 'withFieldWrapper',
     props: {
+      label: {
+        type: String,
+        default: undefined
+      },
       modelValue: {
         type: null,
         default: undefined
@@ -149,11 +153,13 @@ function withField (el) {
       var validations = ref$2.validations;
       var modelValue = ref$2.modelValue;
       var initialValue = modelValue ? modelValue.value : undefined;
+      var label = computed(function () { return props.label; });
       // Build a fully qualified field name using dot notation for nested fields
       // ex: user.name
       var name = path ? (path + "." + (attrs.model)) : attrs.model;
       var ref$3 = useField(name, validations, {
-        initialValue: initialValue
+        initialValue: initialValue,
+        label: label
       });
       var value = ref$3.value;
       var errorMessage = ref$3.errorMessage;

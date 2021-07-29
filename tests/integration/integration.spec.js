@@ -578,7 +578,7 @@ describe('FVL integration', () => {
     const wrapper = mount({
       template: `
         <SchemaWithValidation :schema="schema">
-        
+
           <template #afterForm="{ validation }">
             <span id="error">{{ validation.errors.firstName }}</span>
             <button :disabled="!validation.meta.valid"></button>
@@ -625,7 +625,7 @@ describe('FVL integration', () => {
     const wrapper = mount({
       template: `
         <SchemaWithValidation :schema="schema">
-        
+
           <template #beforeForm="{ validation }">
             <span id="error">{{ validation.errors.firstName }}</span>
             <button :disabled="!validation.meta.valid"></button>
@@ -656,5 +656,72 @@ describe('FVL integration', () => {
     await flushPromises()
     expect(button.element.disabled).toBe(false)
     expect(wrapper.find('#error').text()).toBe('')
+  })
+
+  it('validates fields with array in array schema', async () => {
+    const SchemaWithValidation = SchemaFormFactory([veeValidatePlugin()])
+    const schema = {
+      user: {
+        component: SchemaWithValidation,
+        model: 'subform',
+        schema: [
+          {
+            model: 'email',
+            label: 'Email',
+            component: FormText,
+            validations: yup.string().required(REQUIRED_MESSAGE)
+          }, [
+            {
+              model: 'firstName',
+              label: 'First Name',
+              component: FormText,
+              validations: yup.string().required(REQUIRED_MESSAGE)
+            }, {
+              model: 'lastName',
+              label: 'Last Name',
+              component: FormText,
+              validations: yup.string().required(REQUIRED_MESSAGE)
+            },
+          ]
+        ]
+      }
+    }
+
+    const wrapper = mount({
+      template: `
+        <SchemaWithValidation :schema="schema" />
+      `,
+      components: {
+        SchemaWithValidation
+      },
+      setup () {
+        const formData = ref({})
+        useSchemaForm(formData)
+
+        return {
+          schema
+        }
+      }
+    })
+
+    const inputs = wrapper.findAllComponents(FormText)
+    const errors = wrapper.findAll('span')
+    const form = wrapper.find('form')
+
+    inputs[0].setValue('test@gmail.com')
+    await flushPromises()
+    expect(errors[0].text()).toBe('')
+
+    inputs[1].setValue('Tom')
+    await flushPromises()
+    expect(errors[1].text()).toBe('')
+
+    inputs[2].setValue('Cruise')
+    await flushPromises()
+    expect(errors[2].text()).toBe('')
+
+    inputs[1].setValue('')
+    await flushPromises()
+    expect(errors[1].text()).toBe(REQUIRED_MESSAGE)
   })
 })

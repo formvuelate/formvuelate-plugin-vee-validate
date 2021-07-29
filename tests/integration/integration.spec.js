@@ -114,7 +114,6 @@ describe('FVL integration', () => {
     const input = wrapper.findComponent(FormText)
     input.setValue('')
     await flushPromises()
-    console.log(wrapper.find('span').text())
     expect(wrapper.find('span').text()).toMatch(/First Name/)
     input.setValue('hello')
     await flushPromises()

@@ -5,10 +5,10 @@
  */
 
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vee-validate')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vee-validate'], factory) :
-	(factory((global['@formvuelate/pluginVeeValidate'] = {}),global.Vue,global.VeeValidate));
-}(this, (function (exports,vue,veeValidate) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue'), require('vee-validate')) :
+	typeof define === 'function' && define.amd ? define(['vue', 'vee-validate'], factory) :
+	(global['@formvuelate/pluginVeeValidate'] = factory(global.Vue,global.VeeValidate));
+}(this, (function (vue,veeValidate) { 'use strict';
 
 /**
  * For a Schema, find the elements in each of the rows and remap the element with the given function
@@ -197,10 +197,6 @@ function withField (el) {
   return wrappedComponent
 }
 
-exports.mapElementsInSchema = mapElementsInSchema;
-exports['default'] = VeeValidatePlugin;
-exports.withField = withField;
-
-Object.defineProperty(exports, '__esModule', { value: true });
+return VeeValidatePlugin;
 
 })));

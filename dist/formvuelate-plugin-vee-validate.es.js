@@ -194,5 +194,4 @@ function withField (el) {
   return wrappedComponent
 }
 
-export { mapElementsInSchema, withField };
 export default VeeValidatePlugin;

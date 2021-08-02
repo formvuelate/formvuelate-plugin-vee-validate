@@ -6,8 +6,6 @@
 
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 var vue = require('vue');
 var veeValidate = require('vee-validate');
 
@@ -198,6 +196,4 @@ function withField (el) {
   return wrappedComponent
 }
 
-exports.mapElementsInSchema = mapElementsInSchema;
-exports['default'] = VeeValidatePlugin;
-exports.withField = withField;
+module.exports = VeeValidatePlugin;

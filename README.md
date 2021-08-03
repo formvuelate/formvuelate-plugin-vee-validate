@@ -5,6 +5,8 @@
     <img width="150px" src="https://github.com/logaretm/vee-validate/raw/main/logo.png" title="Vee validate logo">
 </p>
 
-Vee-validate plugin for FormVueLate
+# Deprecated
 
-For full documentation check out [FormVueLate's docs](http://formvuelate.js.org/)
+This repo is now deprecated, and has been moved to a monorepo structure on [https://github.com/formvuelate/formvuelate](https://github.com/formvuelate/formvuelate)
+
+New issues/PRs here will be ignored and the repository will eventually be archived. 
